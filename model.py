@@ -15,8 +15,10 @@ from keras.layers import Lambda, Conv2D, MaxPooling2D, Dropout, Dense, Flatten
 IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 66, 200, 3
 INPUT_SHAPE = (IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS)
 
+
 def load_image(data_dir, image_file):
     return mpimg.imread(os.path.join(data_dir, image_file.strip()))
+
 
 def process_image(image):
     # Crop
@@ -28,14 +30,16 @@ def process_image(image):
     return image
 
 # Image Augmentation
+
+
 def image_augument(data_dir, center, left, right, steering_angle, range_x=100, range_y=10):
     # Random choice from 1-3
     choice = np.random.choice(3)
-    if choice == 0: # Left Image
+    if choice == 0:  # Left Image
         image, steering_angle = load_image(data_dir, left), steering_angle + 0.2
     elif choice == 1:  # Right Image
         image, steering_angle = load_image(data_dir, right), steering_angle - 0.2
-    else :  # Center Image
+    else:  # Center Image
         image, steering_angle = load_image(data_dir, center), steering_angle
 
     # Flip Image
@@ -70,8 +74,8 @@ def image_augument(data_dir, center, left, right, steering_angle, range_x=100, r
 
     # Change Brightness
     hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-    hsv[:,:,2] =  hsv[:,:,2] * (1.0 + 0.4 * (np.random.rand() - 0.5))
-    image =  cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+    hsv[:, :, 2] = hsv[:, :, 2] * (1.0 + 0.4 * (np.random.rand() - 0.5))
+    image = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
 
     return image, steering_angle
 
@@ -112,7 +116,7 @@ def load_csv():
 
 def train_model(X_train, X_valid, y_train, y_valid):
     model = Sequential()
-    model.add(Lambda(lambda x: (x/127.5-1.0), input_shape=INPUT_SHAPE))
+    model.add(Lambda(lambda x: (x / 127.5 - 1.0), input_shape=INPUT_SHAPE))
     model.add(Conv2D(24, 5, 5, activation='elu', subsample=(2, 2)))
     model.add(Conv2D(36, 5, 5, activation='elu', subsample=(2, 2)))
     model.add(Conv2D(48, 5, 5, activation='elu', subsample=(2, 2)))
@@ -127,11 +131,11 @@ def train_model(X_train, X_valid, y_train, y_valid):
     # See the sumary of the model
     model.summary()
 
-    checkpoint = ModelCheckpoint('model_new.h5', monitor='val_loss', verbose=0, mode='auto')
+    checkpoint = ModelCheckpoint('model.h5', monitor='val_loss', verbose=0, mode='auto')
     model.compile(loss='mean_squared_error', optimizer=Adam(lr=0.0001))
 
     model.fit_generator(batch_generator('data', X_train, y_train, 40, True),
-                        20000, 1, max_q_size=1,
+                        20000, 10, max_q_size=1,
                         validation_data=batch_generator('data', X_valid, y_valid, 40, False),
                         nb_val_samples=len(X_valid), callbacks=[checkpoint], verbose=1)
 
