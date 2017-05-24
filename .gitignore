@@ -1,0 +1,17 @@
+.ftpconfig
+.ftpignore
+data/
+data_/
+examples/
+hello.py
+model-000.h5
+model-002.h5
+model-006.h5
+*.pyc
+model_.h5
+model_new.h5
+my.py
+process.py
+test.py
+utils.py
+video/
